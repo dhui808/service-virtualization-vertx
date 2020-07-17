@@ -8,7 +8,7 @@
 
 FROM java:8-jre
 
-ENV VERTICLE_FILE webservicemockserver-0.0.1-fat.jar
+ENV VERTICLE_FILE servicevirtualizationvertx-0.0.1-fat.jar
 
 # Set the location of the verticles
 ENV VERTICLE_HOME /usr/verticles
@@ -18,14 +18,14 @@ EXPOSE 8080
 # Copy your fat jar to the container
 COPY target/$VERTICLE_FILE $VERTICLE_HOME/
 
-# Copy webservicemockdata and logback.xml
-COPY target/webservicemockdata /usr/github-vertx/webservicemockdata
+# Copy servicevirtualizationdata and logback.xml
+COPY target/servicevirtualizationdata /usr/service-virtualization-data/servicevirtualizationdata
 COPY target/classes/logback.xml /usr/webservicemockserver-vertx-logging/logback.xml
 RUN mkdir /usr/webservicemockserver-vertx-logging/logs
 
 RUN groupadd --gid 1000 appusergroup  && useradd --uid 1000 --gid appusergroup --shell /bin/bash --create-home appuser
-RUN chown -R appuser:appusergroup /usr/github-vertx/webservicemockdata
-RUN chmod -R 755 /usr/github-vertx/webservicemockdata
+RUN chown -R appuser:appusergroup /usr/service-virtualization-data/servicevirtualizationdata
+RUN chmod -R 755 /usr/service-virtualization-data/servicevirtualizationdata
 RUN chown -R appuser:appusergroup /usr/webservicemockserver-vertx-logging
 RUN chmod -R 777 /usr/webservicemockserver-vertx-logging
 USER appuser

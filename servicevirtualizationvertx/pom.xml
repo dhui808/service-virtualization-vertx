@@ -16,7 +16,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<docker.image.prefix>yourdockerid</docker.image.prefix>
-		<docker.image>yourdockerid/vertx3-${project.artifactId}</docker.image>
 		<servicevirtualizationdata.home>/usr/service-virtualization-data/servicevirtualizationdata</servicevirtualizationdata.home>
 	</properties>
 
@@ -81,6 +80,14 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.9</version>
+				<configuration>
+					<repository>${docker.image.prefix}/${project.artifactId}</repository>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>

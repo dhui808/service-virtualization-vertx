@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar ./target/webservicemockserver-0.0.1-fat.jar
+java -jar ./target/servicevirtualizationvertx-0.0.1-fat.jar
