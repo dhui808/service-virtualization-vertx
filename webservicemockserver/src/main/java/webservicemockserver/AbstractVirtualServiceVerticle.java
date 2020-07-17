@@ -246,7 +246,7 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 		String flow = req.getParam("flow");
 		String scenario = req.getParam("scenario");
 
-		logger.debug(mockData.getMockServerName() + " flow:" + flow + " Scenario:" + scenario);
+		logger.debug(mockServerName + " flow:" + flow + " Scenario:" + scenario);
 
 		if (null == flow) {
 			return false;
