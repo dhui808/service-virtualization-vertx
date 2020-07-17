@@ -60,7 +60,7 @@
 		</dependency>
 		<dependency>
 			<groupId>mobilebanking</groupId>
-			<artifactId>webservicemockutil</artifactId>
+			<artifactId>servicevirtualizationutils</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 	</dependencies>

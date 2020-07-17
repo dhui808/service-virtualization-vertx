@@ -29,7 +29,7 @@ import io.vertx.ext.web.handler.FaviconHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import webservicemockutil.MockData;
+import servicevirtualizationutils.MockData;
 
 public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 
