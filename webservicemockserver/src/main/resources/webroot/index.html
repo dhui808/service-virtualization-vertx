@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Web Service Mock Servers</title>
+<script type="text/javascript" src="/banking/ajax.js"></script>
+<link href="/banking/css.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="topnav" id="myTopnav">
+  <button id="mobilewebTab" class="tablinks" onclick="openTab(event, 'mobileweb')">MobileWeb</button>
+  <!--  <button id="chsTab" class="tablinks" onclick="openTab(event, 'chs')">CHS</button>-->
+</div>
+
+<div id="mobileweb" class="tabcontent">
+<p><b><h2>Develop Modern Web Applications with Virtual Services</h2></b></p>
+<p>In a nutshell, a virtual services is a mocking service that simulates the real service.</p>
+
+<p>Why bother with virtual services?</p>
+
+<p>Because the real services are not always available. 
+This is becoming even more pronounced since modern applications adopt increasingly distributed architecture
+via microservices. As such, developers and QA frequently find themselves unable to do testing since a back end service 
+is down. Their productivity is hit hard and the companies find their IT cost soaring.
+</p>
+<p>The virtual services implemented in this PoC project has a unique feature that no other vendor products offer:
+it allows the multiple different responses for the same request. This is exactly what the UI developers need.
+</p>
+
+<p>
+How is this achieved? 
+</p>
+
+<p>
+It is actually simple and intuitive - the UI developer has to select which scenario he/she wants to test, before
+doing the test.
+</p>
+
+<p>
+In this project, the four test scenarios in a login flow for a banking web application are included. 
+</p>
+
+<p><b>Test Steps:</b></p>
+<p>Step 1: Click one of the scenario you want to test (i.e. you need to go to the desired page so you can continue developing it or fix defect.)</p> 
+<p>Step 2: The login page will open in a new tab (please allow pop-ups if your browser blocks them.). If it doesn't, click <a id="entryPageUrl" target="_blank" style="text-decoration: none;">here (please enable pop-ups in you browser setting).</a>, or manually open the URL in a new tab:</p>
+<p></p>
+<p>Step 3: Log in with any card number and password, or just leave them blank</p>
+
+<p><b>Test Scenarios:</b></p>
+<ol>
+<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=default')">Login successful, no MFA, Account Detail successful</a></li>
+<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=login-failed')">Login failed</a></li>
+<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=account-details-failed')">Login successful, no MFA, Account Details failed</a></li>
+<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=mfa')">Login successful, with MFA, Account Detail successful</a></li>
+</ol>
+</div>
+
+<!--  
+<div id="chs" class="tabcontent">
+	<p><b><h2>CHS configuration</h2></b></p>
+	<p><b>Alert</b></p>
+	
+	<ol>
+	<li><a href="/banking/chs/?flow=recover&scenario=2fa-disabled-recaptcha-enabled">2FA disabled, reCaptcha enabled</a></li>
+	<li><a href="/banking/chs/?flow=recover&scenario=2fa-enabled-recaptcha-disabled">2FA enabled, reCaptcha disabled</a></li>
+	</ol>
+	
+
+</div>
+-->
+
+<script type="text/javascript">
+(function() {
+	var activeTab = "mobilewebTab";
+	
+	if(location.search.indexOf('activeTab=') > 0 && location.search.split('activeTab=') && location.search.split('activeTab=') != ""){
+		activeTab = location.search.split('activeTab=')[1];
+	}
+	
+	document.getElementById(activeTab).click();
+	
+	init();
+})();
+
+</script>
+
+<div id="loadImage-wrap">
+    <img id="loadImage" style="display:none;" />
+</div>
+
+</body>
+</html>
