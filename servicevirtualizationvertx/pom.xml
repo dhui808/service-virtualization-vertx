@@ -4,10 +4,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mobilebanking</groupId>
-	<artifactId>webservicemockserver</artifactId>
+	<artifactId>servicevirtualizationvertx</artifactId>
 	<version>0.0.1</version>
-	<name>webservicemockserver</name>
-	<description>Mobile Banking Service Virtualization project with Vert.x</description>
+	<name>servicevirtualizationvertx</name>
+	<description>Mobile Banking Service Virtualization Vert.x Server</description>
 
 	<properties>
 		<main.verticle>webservicemockserver.WebserviceVirtualServiceApplication</main.verticle>

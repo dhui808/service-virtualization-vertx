@@ -8,6 +8,6 @@
   <packaging>pom</packaging>
 
   <modules>
-     <module>webservicemockserver</module>
+     <module>servicevirtualizationvertx</module>
    </modules>
 </project>
