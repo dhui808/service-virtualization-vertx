@@ -5,8 +5,8 @@
  *  These three properties need to be in sync with their counterparts in the service virtualization server.
  */
 var contextpath = location.pathname.replace(/\/$/, "");
-var restpath = '/rest/';
-var configpath= 'config';
+var restpath = '/rest';
+var configpath= '/config';
 /**
  * Invoked when the setup page opens.
  * @returns

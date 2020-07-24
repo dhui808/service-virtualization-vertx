@@ -75,6 +75,8 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle  {
 	    router.get("/favicon.ico").handler(FaviconHandler.create("webroot/favicon.ico"));
 	    router.get("/").handler(context -> context.reroute(contextRoot + "/index.html"));
 	    router.get(contextRoot).handler(context -> context.reroute(contextRoot + "/index.html"));
+	    router.get("/*.css").handler(context -> context.reroute(contextRoot + context.request().path()));
+	    router.get("/*.js").handler(context -> context.reroute(contextRoot + context.request().path()));
 	    // end::static-assets[]
 	    
 		router.options().handler(this::optionsHandler);
