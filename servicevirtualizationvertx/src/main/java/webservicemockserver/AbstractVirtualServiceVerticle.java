@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 
 import org.apache.commons.collections4.MapUtils;
@@ -31,19 +32,20 @@ import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import servicevirtualizationutils.MockData;
 
-public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
+public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle  {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractVirtualServiceVerticle.class);
 	
 	protected MockData mockData;
-	private String mockDataHome = (String)PropertiesLoader.loadProperties("application.properties")
-			.get("servicevirtualizationdata.home");
+	Properties appPropertis = PropertiesLoader.loadProperties("application.properties");
+	private String mockDataHome = (String)appPropertis.get("servicevirtualizationdata_home");
 	private String mockServerName;
 	public static final String HTTP_SERVER_PORT = "http.server.port";
 	public static final String HTTP_CONTEXT_ROOT = "http.context.root";
 	protected String contextRoot;
-	protected String restPath = "/rest";
-	
+	protected String restpath = (String)appPropertis.get("restpath");
+	protected String configpath = (String)appPropertis.get("configpath");
+
 	protected AbstractVirtualServiceVerticle(String mockServerName) {
 
 		this.mockServerName = mockServerName;
@@ -66,8 +68,7 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 	    router.route().handler(BodyHandler.create());
 	    router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
-	    router.get(contextRoot + restPath + "/retrieveEntryPageURL").handler(this::retrieveEntryPageURLHandler);
-		router.get(contextRoot + restPath + "/*").handler(this::selectFlowScenarioHandler);
+	    router.post(contextRoot + restpath + configpath).handler(this::configHandler);
 		
 	    // tag::static-assets[]
 	    router.get(contextRoot + "/*").handler(StaticHandler.create().setCachingEnabled(false)); // <1> <2>
@@ -100,9 +101,20 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 		context.response().end();
 	}
 
+	private void configHandler(RoutingContext context) {
+		
+		String query = context.request().query();
+		
+		logger.debug("query> " + query);
+		
+		if (query.contains("retrieveEntryPageURL")) {
+			retrieveEntryPageURLHandler(context);
+		} else {
+			selectFlowScenarioHandler(context);
+		}
+	}
+	
 	private void retrieveEntryPageURLHandler(RoutingContext context) {
-
-		logger.debug("retrieveEntryPageURLHandler is called.");
 
 		HttpServerResponse resp = context.response();
 		
@@ -130,18 +142,20 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 
 		// Handle other requests - by default, it is the selecting flow and scenario.
 		boolean isSetFlow = addFlowScenarioCookies(context);
-		if (!isSetFlow) {
-			// normal rest GET request
-			String respFilePath = findResponseFilePath(context, "_GET");
-			logger.debug("respFilePath:" + respFilePath);
-			populateResponse(context, respFilePath);
-		}
+//		if (!isSetFlow) {
+//			// normal rest GET request
+//			String respFilePath = findResponseFilePath(context, "_GET");
+//			logger.debug("respFilePath:" + respFilePath);
+//			populateResponse(context, respFilePath);
+//		}
 		
 		context.response().end();
 	}
 
 	private void postHandler(RoutingContext context) {
 
+		logger.debug("postHandler> " + context.request().absoluteURI());
+		
 		String respFilePath = findResponseFilePath(context, "");
 
 		populateResponse(context, respFilePath);
@@ -161,23 +175,8 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 
 	private void createMockData() {
 		
-		logger.debug("createMockData " + mockData);
+		mockData = MockData.getMockData(mockServerName, mockDataHome);
 
-		if (null != mockData) {
-			return;
-		}
-
-		synchronized (this) {
-
-			logger.debug("createMockData examining " + mockData);
-			
-			if (null != mockData) {
-				return;
-			}
-
-			mockData = MockData.getMockData(mockServerName, mockDataHome);
-		}
-		
 		logger.debug("createMockData now: " + mockData);
 	}
 
@@ -261,6 +260,7 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 	}
 	
 	private void eraseCookies(HttpServerRequest req, HttpServerResponse resp) {
+		
 		Map<String, Cookie> cookies = req.cookieMap();
 		if (MapUtils.isNotEmpty(cookies)) {
 			Iterator<Map.Entry<String, Cookie>> it = cookies.entrySet().iterator();
@@ -287,13 +287,15 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 
 	protected String adjustResponseFile(String responseFile, HttpServerRequest req, HttpServerResponse resp,
 			String method) {
+		
 		// By default, the responseFile in the alternateResponseFileMap will alternate
 		// with the 2nd version;
 		List<String> alternateResponseFiles = mockData.getAlternateResponseFiles();
 		String filePathNoSuffix = responseFile.substring(0, responseFile.indexOf(".json"));
 		String responseFileName = filePathNoSuffix.substring(filePathNoSuffix.lastIndexOf("/") + 1);
-
-		if (alternateResponseFiles.contains(req.path() + method)) {
+		String path = getPathInfo(req.path() + method);
+		
+		if (alternateResponseFiles.contains(path)) {
 			boolean sendAlternate = changeCountCookie(responseFileName, req, resp);
 			if (sendAlternate) {
 				responseFile = filePathNoSuffix + "2.json";
@@ -307,7 +309,7 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 		boolean sendAlternate = false;
 		boolean foundCookie = false;
 		Map<String, Cookie> cookies = req.cookieMap();
-
+		
 		if (null == cookies)
 			cookies = new HashMap<String, Cookie>();
 
@@ -341,13 +343,13 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 	}
 	
 	/**
-	 * Removes the context + restPath from the request path and returns the equivalent of Servlet path info.  
+	 * Removes the context + restpath from the request path and returns the equivalent of Servlet path info.  
 	 * @param vertxPath
 	 * @return
 	 */
 	protected String getPathInfo(String vertxPath) {
 		
-		String pathPrefix = contextRoot + restPath;
+		String pathPrefix = contextRoot + restpath;
 		
 		return vertxPath.replace(pathPrefix, "");
 	}
@@ -395,7 +397,7 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 		protected String getContentType() {
 			return "application/json";
 		}
-
+		
 		// PUT and GET request have the _PUT and _GET suffix being added to pathInfo for
 		// matching.
 		// The purpose of this approach is to support the scenarios where PUT/GET/POST
@@ -412,9 +414,11 @@ public abstract class AbstractVirtualServiceVerticle extends AbstractVerticle {
 			String flow = flowScenarioMap.get("flow");
 			String scenario = flowScenarioMap.get("scenario");
 			String path = req.path();
+			logger.debug("path;" + path);
 			path = getPathInfo(path);
+			
 			String responseFile = mockData.findFilePath(path + method, flow, scenario);
-
+			logger.debug("responseFile:" + responseFile);
 			responseFile = adjustResponseFile(responseFile, req, resp, method);
 			
 			logger.debug("response file after adjustment;" + responseFile);

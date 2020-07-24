@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Web Service Mock Servers</title>
+<title>Service Virtaulization UI</title>
 <script type="text/javascript" src="/banking/ajax.js"></script>
 <link href="/banking/css.css" rel="stylesheet"/>
 </head>
@@ -14,17 +14,21 @@
 </div>
 
 <div id="mobileweb" class="tabcontent">
-<p><b><h2>Develop Modern Web Applications with Virtual Services</h2></b></p>
-<p>In a nutshell, a virtual services is a mocking service that simulates the real service.</p>
+<p><b><h2>Develop Modern Web Applications with Service Virtualization</h2></b></p>
+<p>In a nutshell, service virtualization provides a set of mocking services that simulate the real services.</p>
 
-<p>Why bother with virtual services?</p>
+<p>Why bother with service virtualization?</p>
 
 <p>Because the real services are not always available. 
 This is becoming even more pronounced since modern applications adopt increasingly distributed architecture
-via microservices. As such, developers and QA frequently find themselves unable to do testing since a back end service 
+via microservices. As such, developers and QA frequently find themselves unable to do testing since a backend service 
 is down. Their productivity is hit hard and the companies find their IT cost soaring.
+<br/>
+Even if the real services are available, it is difficult or impossible to test the application behaviour in a particular
+error scenario. For example, if we need to test how the UI behaves when a backend service got a problem with its dependency,
+how can the backend service achieve this condition? 
 </p>
-<p>The virtual services implemented in this PoC project has a unique feature that no other vendor products offer:
+<p>The service virtualization implemented in this PoC project has a unique feature that no other vendor products offer:
 it allows the multiple different responses for the same request. This is exactly what the UI developers need.
 </p>
 
@@ -49,10 +53,10 @@ In this project, the four test scenarios in a login flow for a banking web appli
 
 <p><b>Test Scenarios:</b></p>
 <ol>
-<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=default')">Login successful, no MFA, Account Detail successful</a></li>
-<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=login-failed')">Login failed</a></li>
-<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=account-details-failed')">Login successful, no MFA, Account Details failed</a></li>
-<li><a href="#" onclick="selectFlowScenario('/banking/rest/?flow=login&scenario=mfa')">Login successful, with MFA, Account Detail successful</a></li>
+<li><a href="#" onclick="selectFlowScenario('flow=login&scenario=default')">Login successful, no MFA, Account Detail successful</a></li>
+<li><a href="#" onclick="selectFlowScenario('flow=login&scenario=login-failed')">Login failed</a></li>
+<li><a href="#" onclick="selectFlowScenario('flow=login&scenario=account-details-failed')">Login successful, no MFA, Account Details failed</a></li>
+<li><a href="#" onclick="selectFlowScenario('flow=login&scenario=mfa')">Login successful, with MFA, Account Detail successful</a></li>
 </ol>
 </div>
 

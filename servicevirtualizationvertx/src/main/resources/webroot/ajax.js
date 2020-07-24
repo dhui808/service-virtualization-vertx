@@ -1,4 +1,13 @@
 /**
+ *	contextpath is derived from the url of index.html page.
+ *  restpath can be manually modified. The default value is "/rest/"
+ *  configpath can be manually modified. The default value is "_config"
+ *  These three properties need to be in sync with their counterparts in the service virtualization server.
+ */
+var contextpath = location.pathname.replace(/\/$/, "");
+var restpath = '/rest/';
+var configpath= 'config';
+/**
  * Invoked when the setup page opens.
  * @returns
  */
@@ -16,7 +25,8 @@ function init() {
 function makeAjaxCall(requestURI, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.responseType = 'json';
-	xhr.open('GET', requestURI);
+	xhr.open('POST', requestURI, true);
+	xhr.setRequestHeader('Content-type', 'application/json');
 	xhr.onload = function() {
 	    if (xhr.status === 200) {
 	        
@@ -42,7 +52,7 @@ function retrieveEntryPageURL() {
 	
 	if (!entryPageUrlCookie) {
 		console.debug("entryPageUrl cookie is not loaded yet.");
-		var uri = location.pathname.replace(/\/$/, "") + "/rest/retrieveEntryPageURL"
+		var uri = contextpath + restpath + configpath + "?retrieveEntryPageURL"
 		makeAjaxCall(uri, retrieveEntryPageURLCallback);
 	} else {
 		retrieveEntryPageURLCallback({entryPageUrl: entryPageUrlCookie});
@@ -73,9 +83,9 @@ function cleanupLocalStorage() {
  * @param uri
  * @returns
  */
-function selectFlowScenario(uri) {
+function selectFlowScenario(query) {
 	
-	makeAjaxCall(uri + "&t=" + Math.random(), openInNewTab);
+	makeAjaxCall(contextpath + restpath + configpath + "?" +query + "&t=" + Math.random(), openInNewTab);
 };
 
 function getCookie(cookieName) {

@@ -11,12 +11,12 @@
 
 	<properties>
 		<main.verticle>webservicemockserver.WebserviceVirtualServiceApplication</main.verticle>
-		<vertx.version>3.9.0</vertx.version>
+		<vertx.version>3.9.2</vertx.version>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<docker.image.prefix>yourdockerid</docker.image.prefix>
-		<servicevirtualizationdata.home>/usr/service-virtualization-data/servicevirtualizationdata</servicevirtualizationdata.home>
+		<servicevirtualizationdata_home>/usr/service-virtualization-data/servicevirtualizationdata</servicevirtualizationdata_home>
 	</properties>
 
 	<dependencyManagement>
@@ -36,11 +36,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
 			<version>4.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.30</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -99,7 +94,7 @@
 						<configuration>
 							<target name="copy servicevirtualizationdata folder to web project">
 								<copy todir="${project.build.directory}/servicevirtualizationdata">
-									<fileset dir="${servicevirtualizationdata.home}"
+									<fileset dir="${servicevirtualizationdata_home}"
 										excludes=".settings/,.project">
 									</fileset>
 								</copy>
