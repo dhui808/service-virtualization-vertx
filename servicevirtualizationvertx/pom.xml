@@ -15,7 +15,6 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<docker.image.prefix>yourdockerid</docker.image.prefix>
 		<servicevirtualizationdata_home>/usr/service-virtualization-data/servicevirtualizationdata</servicevirtualizationdata_home>
 	</properties>
 
@@ -76,12 +75,71 @@
 
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.9</version>
-				<configuration>
-					<repository>${docker.image.prefix}/${project.artifactId}</repository>
-				</configuration>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<!-- Remove existing image from local repo -->
+					<execution> <id>docker-clean</id> <phase>install</phase> <goals> 
+						<goal>exec</goal> </goals> <configuration> <executable>docker</executable> 
+						<workingDirectory>${project.basedir}</workingDirectory> <arguments> <argument>rmi</argument> 
+						<argument>${docker.user}/${project.artifactId}</argument> </arguments> </configuration> 
+					</execution>
+
+					<!-- Create new docker image using Dockerfile which must be present 
+						in current working directory. Tag the image using maven project version information. -->
+					<execution>
+						<id>docker-build</id>
+						<phase>install</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>docker</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+							<arguments>
+								<argument>build</argument>
+								<argument>-t</argument>
+								<argument>${docker.user}/${project.artifactId}</argument>
+								<argument>.</argument>
+							</arguments>
+						</configuration>
+					</execution>
+
+					<!-- Login and Push the image to a docker repo. -->
+					<execution>
+						<id>docker-login</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>docker</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+							<arguments>
+								<argument>login</argument>
+								<argument>-u</argument>
+								<argument>${docker.user}</argument>
+								<argument>-p</argument>
+								<argument>${docker.password}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>docker-push</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>docker</executable>
+							<arguments>
+								<argument>push</argument>
+								<argument>${docker.user}/${project.artifactId}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -89,11 +147,13 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-					<id>copy-servicevirtualizationdata</id>
+						<id>copy-servicevirtualizationdata</id>
 						<phase>package</phase>
 						<configuration>
-							<target name="copy servicevirtualizationdata folder to web project">
-								<copy todir="${project.build.directory}/servicevirtualizationdata">
+							<target
+								name="copy servicevirtualizationdata folder to web project">
+								<copy
+									todir="${project.build.directory}/servicevirtualizationdata">
 									<fileset dir="${servicevirtualizationdata_home}"
 										excludes=".settings/,.project">
 									</fileset>
@@ -137,8 +197,37 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- external properties -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>/usr/servicevirtualization/maven.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>test-repo</id>
+			<name>Test Repository</name>
+			<url>file:///usr/maven/repository</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 </project>
