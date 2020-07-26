@@ -19,13 +19,13 @@ EXPOSE 8080
 COPY target/$VERTICLE_FILE $VERTICLE_HOME/
 
 # Copy servicevirtualizationdata and logback.xml
-COPY target/servicevirtualizationdata /usr/service-virtualization-data
+COPY target/servicevirtualizationdata /usr/service-virtualization-data/servicevirtualizationdata
 COPY target/classes/logback.xml /usr/webservicemockserver-vertx-logging/logback.xml
 RUN mkdir /usr/webservicemockserver-vertx-logging/logs
 
 RUN groupadd --gid 1000 appusergroup  && useradd --uid 1000 --gid appusergroup --shell /bin/bash --create-home appuser
-RUN chown -R appuser:appusergroup /usr/service-virtualization-data
-RUN chmod -R 755 /usr/service-virtualization-data
+RUN chown -R appuser:appusergroup /usr/service-virtualization-data/servicevirtualizationdata
+RUN chmod -R 755 /usr/service-virtualization-data/servicevirtualizationdata
 RUN chown -R appuser:appusergroup /usr/webservicemockserver-vertx-logging
 RUN chmod -R 777 /usr/webservicemockserver-vertx-logging
 USER appuser

@@ -15,7 +15,7 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<servicevirtualizationdata_home>/usr/service-virtualization-data</servicevirtualizationdata_home>
+		<servicevirtualizationdata_home>/usr/service-virtualization-data/servicevirtualizationdata</servicevirtualizationdata_home>
 	</properties>
 
 	<dependencyManagement>
@@ -80,11 +80,11 @@
 				<version>3.0.0</version>
 				<executions>
 					<!-- Remove existing image from local repo -->
-					<execution> <id>docker-clean</id> <phase>install</phase> <goals> 
+<!-- 					<execution> <id>docker-clean</id> <phase>install</phase> <goals> 
 						<goal>exec</goal> </goals> <configuration> <executable>docker</executable> 
 						<workingDirectory>${project.basedir}</workingDirectory> <arguments> <argument>rmi</argument> 
 						<argument>${docker.user}/${project.artifactId}</argument> </arguments> </configuration> 
-					</execution>
+					</execution> -->
 
 					<!-- Create new docker image using Dockerfile which must be present 
 						in current working directory. Tag the image using maven project version information. -->
