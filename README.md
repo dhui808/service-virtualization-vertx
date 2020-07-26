@@ -37,6 +37,17 @@ Arguments:run webservicemockserver.WebserviceVirtualServiceApplication
 Right-click on WebserviceVirtualServiceApplication.java - Debug As - Debug Configuration...  
 Select the Debug Configuration defined above - Click Debug button 
 
+## Build
+cd servicevirtualizationvertx
+
+mvn clean install
+
+## Build Docker image
+mvn clean install -Pdocker
+
+## Push the image to Docker Hub registry
+mvn deploy -Pdocker
+
 ## Start server from command line - Windows
 start.cmd
 
@@ -51,7 +62,11 @@ mvn clean install
 
 mvn deploy
 
-## Run Docker image
+## Run Docker image with Fabric8
+
+mvn install -Pfabric8
+
+## Run Docker image directly
 
 docker run -d -p 8080:8080 -p 5005:5005 -t dannyhui/servicevirtualizationvertx
 

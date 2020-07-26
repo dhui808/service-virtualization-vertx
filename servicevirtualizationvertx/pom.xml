@@ -75,73 +75,6 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<!-- Remove existing image from local repo -->
-<!-- 					<execution> <id>docker-clean</id> <phase>install</phase> <goals> 
-						<goal>exec</goal> </goals> <configuration> <executable>docker</executable> 
-						<workingDirectory>${project.basedir}</workingDirectory> <arguments> <argument>rmi</argument> 
-						<argument>${docker.user}/${project.artifactId}</argument> </arguments> </configuration> 
-					</execution> -->
-
-					<!-- Create new docker image using Dockerfile which must be present 
-						in current working directory. Tag the image using maven project version information. -->
-					<execution>
-						<id>docker-build</id>
-						<phase>install</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>docker</executable>
-							<workingDirectory>${project.basedir}</workingDirectory>
-							<arguments>
-								<argument>build</argument>
-								<argument>-t</argument>
-								<argument>${docker.user}/${project.artifactId}</argument>
-								<argument>.</argument>
-							</arguments>
-						</configuration>
-					</execution>
-
-					<!-- Login and Push the image to a docker repo. -->
-					<execution>
-						<id>docker-login</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>docker</executable>
-							<workingDirectory>${project.basedir}</workingDirectory>
-							<arguments>
-								<argument>login</argument>
-								<argument>-u</argument>
-								<argument>${docker.user}</argument>
-								<argument>-p</argument>
-								<argument>${docker.password}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>docker-push</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>docker</executable>
-							<arguments>
-								<argument>push</argument>
-								<argument>${docker.user}/${project.artifactId}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>3.0.0</version>
@@ -220,6 +153,216 @@
 		</plugins>
 
 	</build>
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<!-- Remove existing image from local repo -->
+<!-- 							<execution>
+								<id>docker-clean</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>docker</executable>
+									<workingDirectory>${project.basedir}</workingDirectory>
+									<arguments>
+										<argument>rmi</argument>
+										<argument>${docker.user}/${project.artifactId}</argument>
+									</arguments>
+								</configuration>
+							</execution> -->
+
+							<!-- Create new docker image using Dockerfile which must be present 
+								in current working directory. Tag the image using maven project version information. -->
+							<execution>
+								<id>docker-build</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>docker</executable>
+									<workingDirectory>${project.basedir}</workingDirectory>
+									<arguments>
+										<argument>build</argument>
+										<argument>-t</argument>
+										<argument>${docker.user}/${project.artifactId}</argument>
+										<argument>.</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
+							<!-- Login and Push the image to a docker repo. -->
+							<execution>
+								<id>docker-login</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>docker</executable>
+									<workingDirectory>${project.basedir}</workingDirectory>
+									<arguments>
+										<argument>login</argument>
+										<argument>-u</argument>
+										<argument>${docker.user}</argument>
+										<argument>-p</argument>
+										<argument>${docker.password}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>docker-push</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>docker</executable>
+									<arguments>
+										<argument>push</argument>
+										<argument>${docker.user}/${project.artifactId}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-servicevirtualizationdata</id>
+								<phase>package</phase>
+								<configuration>
+									<target
+										name="copy servicevirtualizationdata folder to web project">
+										<copy
+											todir="${project.basedir}/target/servicevirtualizationdata">
+											<fileset dir="${servicevirtualizationdata_home}"
+												excludes=".settings/,.project">
+											</fileset>
+										</copy>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.4.3</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>io.vertx.core.Launcher</Main-Class>
+												<Main-Verticle>${main.verticle}</Main-Verticle>
+											</manifestEntries>
+										</transformer>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+											<resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
+										</transformer>
+									</transformers>
+									<artifactSet>
+									</artifactSet>
+									<outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- external properties -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>properties-maven-plugin</artifactId>
+						<version>1.0.0</version>
+						<executions>
+							<execution>
+								<phase>initialize</phase>
+								<goals>
+									<goal>read-project-properties</goal>
+								</goals>
+								<configuration>
+									<files>
+										<file>/usr/servicevirtualization/maven.properties</file>
+									</files>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- Fabric8 for starting Docker -->
+			<id>fabric8</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>0.26.0</version>
+						<executions>
+							<execution>
+								<id>start</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>build</goal>
+									<goal>start</goal>
+								</goals>
+							</execution>
+						</executions>
+
+
+						<configuration>
+							<images>
+								<image>
+									<name>docker.io/kkapelon/docker-maven-comparison</name>
+									<build>
+										<dockerFile>${project.basedir}/Dockerfile</dockerFile>
+									</build>
+									<run>
+										<ports>
+											<port>8080:8080</port>
+										</ports>
+<!-- 										<wait>
+											Check for this URL to return a 200 return code ....
+											<url>http://localhost:8080/banking</url>
+											<time>120000</time>
+										</wait> -->
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<distributionManagement>
 		<repository>
