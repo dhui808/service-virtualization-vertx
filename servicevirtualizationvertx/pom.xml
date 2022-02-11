@@ -11,7 +11,7 @@
 
 	<properties>
 		<main.verticle>webservicemockserver.WebserviceVirtualServiceApplication</main.verticle>
-		<vertx.version>3.9.2</vertx.version>
+		<vertx.version>3.9.4</vertx.version>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
